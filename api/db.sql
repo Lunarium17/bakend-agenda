@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS agenda_dbs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE agenda_dbs;
-
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_de_usuario VARCHAR(50) NOT NULL UNIQUE,
