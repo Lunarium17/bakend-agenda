@@ -1,26 +1,41 @@
 <?php
-// Este archivo será el punto de entrada de tu API en Render
+// index.php — punto de entrada global
 
-// Habilitar CORS
-require_once __DIR__ . "/api/config/cors.php";
+header("Content-Type: application/json; charset=utf-8");
+// Habilita CORS si será consumido desde otro dominio
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Router simple: detecta la ruta solicitada
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Elimina el prefijo si Render agrega una ruta extra
-$uri = str_replace("/api", "", $uri);
-
-// Rutas principales
-if (strpos($uri, "/auth") === 0) {
-    require __DIR__ . "/api/auth" . str_replace("/auth", "", $uri) . ".php";
+// Si es una petición OPTIONS (preflight), respondemos y salimos
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-if (strpos($uri, "/contactos") === 0) {
-    require __DIR__ . "/api/contactos" . str_replace("/contactos", "", $uri) . ".php";
+$requestUri = $_SERVER['REQUEST_URI'];
+$requestMethod = $_SERVER['REQUEST_METHOD'];
+
+// Quitar query string si existe
+$uri = parse_url($requestUri, PHP_URL_PATH);
+
+// Aquí defines tus rutas
+if ($uri === '/api/auth/login' && $requestMethod === 'POST') {
+    require __DIR__ . '/api/auth/login.php';
     exit;
 }
 
-// Si no coincide con nada
+if ($uri === '/api/contactos' && $requestMethod === 'GET') {
+    require __DIR__ . '/api/contactos/get_all.php';
+    exit;
+}
+
+// ... más rutas según tu estructura ...
+
+// Si no coincide ninguna ruta:
 http_response_code(404);
-echo json_encode(["ok" => false, "message" => "Ruta no encontrada"]);
+echo json_encode([
+    "ok" => false,
+    "message" => "Ruta no encontrada"
+]);
+
