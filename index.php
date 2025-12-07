@@ -32,10 +32,10 @@ if ($uri === '/api/contactos' && $requestMethod === 'GET') {
 
 // ... más rutas según tu estructura ...
 
-// Si no coincide ninguna ruta:
+/*/ Si no coincide ninguna ruta:
 http_response_code(404);
 echo json_encode([
     "ok" => false,
     "message" => "Ruta no encontrada"
-]);
+]);*/
 
