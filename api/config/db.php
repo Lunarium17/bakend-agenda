@@ -1,28 +1,44 @@
-<?php
+<?php 
 class Database {
 
-    private $host = "localhost";
-    private $port = "3307";
-    private $db_name = "agenda_dbs";
-    private $username = "root";
-    private $password = "IGLOIWTR*5mark";
+    // Si existen variables de entorno (hosting), se usan.
+    // Si NO existen (local), se usan tus credenciales locales.
+
+    private $host;
+    private $port;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
 
-    /*private $host = "sql113.infinityfree.com";
-    private $port = "3306";
-    private $db_name = "if0_40575858_agenda_dbs";
-    private $username = "if0_40575858";
-    private $password = "FQ4UqKEn54";
-    public $conn;*/
+    public function __construct() {
+        $this->host     = getenv("DB_HOST") ?: "bpx01lkc2gjrjagwjuvo-mysql.services.clever-cloud.com";
+        $this->port     = getenv("DB_PORT") ?: "3306";
+        $this->db_name  = getenv("DB_NAME") ?: "bpx01lkc2gjrjagwjuvo";
+        $this->username = getenv("DB_USER") ?: "u56ypq9031ncbwwm";
+        $this->password = getenv("DB_PASS") ?: "lgSYnMWcfX3HJBMSbfEv";
+    }
 
     public function getConnection() {
         $this->conn = null;
+
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name, $this->username, $this->password);
-            $this->conn->exec("set names utf8");
-        } catch(PDOException $exception) {
-            echo "Error de conexión: " . $exception->getMessage();
+
+            $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->db_name};charset=utf8mb4";
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ];
+
+            $this->conn = new PDO($dsn, $this->username, $this->password, $options);
+
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["ok" => false, "message" => "Error de conexión a la base de datos."]);
+            exit;
         }
+
         return $this->conn;
     }
 }
